@@ -165,8 +165,8 @@ def create_dataloader_for_cru(n_seqs=200, obs_proba=0.0006):
 
 parser = argparse.ArgumentParser('CRU')
 # train configs
-parser.add_argument('--epochs', type=int, default=75, help="Number of epochs.")
-parser.add_argument('--lr',  type=float, default=0.0075, help="Learning rate.")
+parser.add_argument('--epochs', type=int, default=100, help="Number of epochs.")
+parser.add_argument('--lr',  type=float, default=0.001, help="Learning rate.")
 parser.add_argument('--lr-decay',  type=float, default=1, help="Learning rate decay.")
 parser.add_argument('--weight-decay',  type=float, default=0, help="Weight decay.")
 parser.add_argument('-b', '--batch-size', type=int, default=128, help="Batch size for training and test set.")
@@ -204,7 +204,7 @@ parser.add_argument('--cut-time', type=int, default=None, help='Timepoint at whi
 parser.add_argument('--num-workers', type=int, default=2, help="Number of workers to use in dataloader.")
 parser.add_argument('--pin-memory', type=bool, default=True, help="If to pin memory in dataloader.")
 parser.add_argument('--data-random-seed', type=int, default=0, help="Random seed for subsampling timepoints and features.")
-parser.add_argument('-rs', '--random_seed', type=int, default=0, help="Random seed for initializing model parameters.")
+parser.add_argument('-rs', '--random_seed', type=int, default=35, help="Random seed for initializing model parameters.")
 parser.add_argument('--quantization',  type=float, default=0.016, help="quantization on the physionet dataset.")
 parser.add_argument('--mnar',  type=str, default='True', help="set mnar assumption to true/false")
 
