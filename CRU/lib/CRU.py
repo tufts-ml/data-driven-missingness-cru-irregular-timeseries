@@ -873,7 +873,12 @@ class CRU(nn.Module):
             perf_df = pd.DataFrame(perf_dict_list)
             
             
-            save_dir = 'training_results/%s'%self.args.dataset                        
+            save_dir = 'training_results/%s'%self.args.dataset     
+            if not os.path.exists(save_dir):
+                # Create the directory
+                os.makedirs(save_dir)
+            
+            
             if self.args.task=='seq_gen':
                 # plot some generated sequences
                 d=2
