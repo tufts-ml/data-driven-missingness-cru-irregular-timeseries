@@ -1,2 +1,2 @@
 #!/bin/sh
-python run_toy_mnar_extrapolation.py
+python pVAE/run_toy_mnar_extrapolation.py

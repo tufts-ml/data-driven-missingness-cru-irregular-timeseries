@@ -4,11 +4,13 @@ matplotlib==3.4.2
 numpy==1.23.4
 pandas==1.5.1
 protobuf==3.20.1
-scikit-learn==1.0
 scipy==1.9.3
 seaborn==0.11.2
 tensorboard==2.6.0
+geotorch==0.2.0
 torch==1.11.0
 torchaudio==0.11.0
 torchvision==0.12.0
 tqdm==4.62.3
+geotorch==0.2.0
+scikit-learn==1.0

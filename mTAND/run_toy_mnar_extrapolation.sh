@@ -1,2 +1,2 @@
 #!/bin/sh
-python3 toy_mnar_extrapolation.py --niters 500 --lr 0.01 --batch-size 128 --rec-hidden 16 --latent-dim 1 --length 20 --enc mtan_rnn --dec mtan_rnn --N 800  --gen-hidden 16 --save 1 --k-iwae 5 --std 0.01 --norm --learn-emb --kl --seed 0 --num-ref-points 20 --dataset toy_mnar_square_sine
+python3 mTAND/toy_mnar_extrapolation.py --niters 500 --lr 0.01 --batch-size 128 --rec-hidden 16 --latent-dim 1 --length 20 --enc mtan_rnn --dec mtan_rnn --N 800  --gen-hidden 16 --save 1 --k-iwae 5 --std 0.01 --norm --learn-emb --kl --seed 0 --num-ref-points 20 --dataset toy_mnar_square_sine
