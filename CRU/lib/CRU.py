@@ -366,61 +366,6 @@ class CRU(nn.Module):
         
         return loss, output_mean, obs, truth, mask_obs, mask_truth, intermediates, imput_loss, imput_mse
     
-    '''
-    # new code component
-    def extrapolation(self, data, track_gradient=True):
-        """Computes loss on extrapolation task
-
-        :param data: batch of data
-        :param track_gradient: if to track gradient for backpropagation
-        :return: loss, outputs, inputs, intermediate variables, metrics on imputed points
-        """
-        obs, truth, obs_valid, obs_times, mask_truth, mask_obs = [
-            j.to(self._device) for j in data]
-
-#         obs, obs_valid = adjust_obs_for_extrapolation(
-#             obs, obs_valid, obs_times, self.args.cut_time)
-        obs_times = self.args.ts * obs_times
-        
-        eval_inds = obs_times>=self.args.cut_time
-        mask_interp = mask_obs*1
-        mask_interp[eval_inds]=0
-        
-        mask_eval = np.logical_and(np.logical_not(mask_interp), mask_obs)
-        
-        
-        
-#         mask_obs[eval_inds,:]=0
-        
-        
-        with torch.set_grad_enabled(track_gradient):
-            output_mean_NT, output_var_NT, output_mask_proba_NT, out_pred_NT, intermediates = self.forward(
-                obs_batch=obs, time_points=obs_times, obs_valid=obs_valid)
-            
-            if self.args.mnar:
-                    loss = GaussianNegLogLik(output_mean_NT, obs, 
-                                             output_var_NT, mask=mask_obs) + bernoulli_nll(mask_obs, 
-                                                                                        output_mask_proba_NT,
-                                                                                        uint8_targets=False)
-            else:
-                    loss = GaussianNegLogLik(
-                        output_mean_NT, obs, output_var_NT, mask=mask_obs)
-            
-#             loss = GaussianNegLogLik(
-#                 output_mean_NT, truth, output_var_NT, mask=mask_truth)
-            
-#             # compute metric on imputed points only
-#             mask_imput = (~obs_valid[..., None]) * mask_truth
-#             imput_loss = GaussianNegLogLik(
-#                 output_mean, truth, output_var, mask=mask_imput)
-#             imput_mse = mse(truth, output_mean, mask=mask_imput)
-            
-            imput_loss = loss
-            imput_mse = mse(obs, output_mean_NT, mask=mask_interp)
-            
-            intermediates['mask_eval']=mask_eval
-        return loss, output_mean_NT, output_var_NT, obs, obs, mask_obs, mask_obs, intermediates, imput_loss, imput_mse
-    '''
     
     # new code component
     def extrapolation(self, data, track_gradient=True):
@@ -873,7 +818,7 @@ class CRU(nn.Module):
             perf_df = pd.DataFrame(perf_dict_list)
             
             
-            save_dir = 'training_results/%s'%self.args.dataset     
+            save_dir = 'CRU/training_results/%s'%self.args.dataset     
             if not os.path.exists(save_dir):
                 # Create the directory
                 os.makedirs(save_dir)
