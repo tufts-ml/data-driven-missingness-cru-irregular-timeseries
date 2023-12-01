@@ -6,7 +6,9 @@ Run the following lines of code for reproducing the toy experiments
 
 ### Create the environment
 `conda create -n mnar-cru python=3.9.7`
+
 `conda activate mnar-cru`
+
 `pip install -r requirements.txt`
 
 ### MNAR-CRU
