@@ -90,42 +90,6 @@ def irregularly_sampled_data_gen_square_sine_2(n=1000, length=50, seed=0, obs_pr
     return obs_values, ground_truth, obs_times, masks
 
 
-def get_toy_data_mnar_square_sine(args, N=1000, obs_proba=0.0006):
-    dim = 2
-    n=N
-    length=50
-    obs_values, ground_truth, obs_times, masks = irregularly_sampled_data_gen_square_sine_2(
-        n, length, obs_proba=obs_proba)
-#     obs_times = np.array(obs_times).reshape(n, -1)
-    obs_times = np.array(obs_times)[:, 0, :]
-    obs_values = np.array(obs_values)
-    mask_vals = np.array(masks)
-    combined_obs_values = np.zeros((n, dim, obs_times.shape[-1]))
-    mask = np.zeros((n, dim, obs_times.shape[-1]))
-    for i in range(dim):
-        combined_obs_values[:, i, :] = obs_values[:, i]
-
-        mask[:, i, :] = mask_vals[:, i]
-    #print(combined_obs_values.shape, mask.shape, obs_times.shape, np.expand_dims(obs_times, axis=1).shape)
-    combined_data = np.concatenate(
-        (combined_obs_values, mask, np.expand_dims(obs_times, axis=1)), axis=1)
-    combined_data = np.transpose(combined_data, (0, 2, 1))
-    print(combined_data.shape)
-    train_data, test_data = model_selection.train_test_split(combined_data, train_size=0.8,
-                                                             random_state=42, shuffle=True)
-    print(train_data.shape, test_data.shape)
-    train_dataloader = DataLoader(torch.from_numpy(
-        train_data).float(), batch_size=len(train_data), shuffle=False)
-    test_dataloader = DataLoader(torch.from_numpy(
-        test_data).float(), batch_size=len(test_data), shuffle=False)
-    data_objects = {"dataset_obj": combined_data,
-                    "train_dataloader": train_dataloader,
-                    "test_dataloader": test_dataloader,
-                    "input_dim": dim,
-                    "ground_truth": np.array(ground_truth)}
-    return data_objects
-
-
 def gen_data_mnar(n_samples=500, seq_len=50, max_time=2):
     """Generates a 1-channel synthetic dataset.
 
@@ -207,10 +171,10 @@ def gen_data_mnar(n_samples=500, seq_len=50, max_time=2):
 def main():
     max_time = 2
     train_data, train_time, train_mask, data_unif, time_unif = gen_data_mnar(
-        n_samples=400, seq_len=50, max_time=max_time)
+        n_samples=800, seq_len=50, max_time=max_time)
 
     test_data, test_time, test_mask, test_data_unif, test_time_unif = gen_data_mnar(
-        n_samples=100, seq_len=50, max_time=max_time)
+        n_samples=200, seq_len=50, max_time=max_time)
     
     # add missing-not-at-randomness to the toy data
     obs_proba=0.0006
@@ -263,7 +227,7 @@ def main():
     # Hyperparameters for training P-VAE
     batch_size = 300#128
     latent_size = 4
-    epochs = 500
+    epochs = 100
     lr = 0.001#1e-4
     min_lr = 5e-5
     sigma = 1
@@ -272,6 +236,7 @@ def main():
     # train on only time upto 1.5 and extrapolate after
     t = np.linspace(0, max_time, 50)
     train_mask[:, :, t>=1.5]=0
+    test_mask[:, :, t>=1.5]=0
 
 
     train_dataset = TimeSeries(
@@ -294,6 +259,9 @@ def main():
     scheduler = make_scheduler(optimizer, lr, min_lr, epochs)
 
     loss_per_epoch = np.zeros(epochs)
+    
+    save_file = 'results/true_vs_predicted_pvae.png'
+    print('Saving results to : %s'%save_file)
     for epoch in range(epochs):
         for val, idx, mask, _, cconv_graph in train_loader:
             optimizer.zero_grad()
@@ -310,7 +278,6 @@ def main():
     test_dataset = TimeSeries(
     scaled_test_data, scaled_test_time, test_mask, max_time=max_time,
     device=device)
-
 
     batch_size = len(test_dataset)
     test_loader = DataLoader(test_dataset, batch_size=batch_size,
@@ -338,15 +305,15 @@ def main():
     max_time=2
     t = np.linspace(0, max_time, 50)
 
-
+    
     n_plot_seqs = 3
     for ii in range(n_plot_seqs):
         for d in range(2):
-            plot_inds_T = train_mask[ii, d, :]==1
+            plot_inds_T = test_mask[ii, d, :]==1
             plot_t = t[plot_inds_T]
-            axs[d, ii].scatter(plot_t, train_data[ii, d, 
+            axs[d, ii].scatter(plot_t, test_data[ii, d, 
                                                      :][plot_inds_T], color='k', label='true')
-            axs[d, ii].plot(t, train_data[ii, d, :], 'k--')
+            axs[d, ii].plot(t, test_data[ii, d, :], 'k--')
             axs[d, ii].scatter(plot_t, gen_data[ii, d, 
                                                     :][plot_inds_T], color='r', label='predicted')
             axs[d, ii].plot(t, gen_data[ii, d, :], 'r--')
@@ -354,8 +321,70 @@ def main():
             axs[d, ii].set_xlim([0, 2])
             axs[d, ii].legend()        
 
-    f.savefig('results/true_vs_predicted_pvae.png')
+    f.savefig(save_file)
     plt.show()
+    
+    '''
+    # evaluate on single test sequence from CRU
+    scaled_eval_time = scaled_test_time[:1, :, :]
+    scaled_eval_data = np.transpose(np.load('eval_seq_data_TD.npz.npy')[np.newaxis, :, :], (0, 2, 1))
+    eval_mask = np.transpose(np.load('eval_seq_mask_TD.npz.npy')[np.newaxis, :, :], (0, 2, 1))
+    eval_mask[:, :, t>=1.5]=0
+    
+    # test the single sequence extrapolations
+    eval_dataset = TimeSeries(
+    scaled_eval_data, scaled_eval_time, eval_mask, max_time=max_time,
+    device=device)
 
+    batch_size = len(eval_dataset)
+    eval_loader = DataLoader(eval_dataset, batch_size=batch_size,
+                             collate_fn=eval_dataset.collate_fn)
+    (val, idx, mask, _, cconv_graph) = next(iter(eval_loader))
+    in_channels = val.shape[1]
+    max_time = max_time
+    t = torch.linspace(0, max_time, 50, device=device)
+    t = t.expand(batch_size, in_channels, len(t)).contiguous()
+    t_mask = torch.ones_like(t)
+
+    encoder.eval()
+    decoder.eval()
+    with torch.no_grad():
+        z = pvae.encoder(cconv_graph, batch_size)
+        if not torch.is_tensor(z):   # P-VAE encoder returns a list
+            z = z[0]
+        imp_data = pvae.decoder(z, t, t_mask)
+        data_noise = torch.empty_like(z).normal_()
+        gen_data = decoder(data_noise, t, t_mask)
+    
+    f, axs = plt.subplots(in_channels, 3, figsize=(22, 10))
+    sns.set_style("whitegrid") # or use "white" if we don't want grid lines
+    sns.set_context("notebook", font_scale=1.3)
+    max_time=2
+    t = np.linspace(0, max_time, 50)
+
+    n_plot_seqs = 3
+    ii=0
+    for d in range(2):
+        plot_inds_T = eval_mask[ii, d, :]==1
+        plot_t = t[plot_inds_T]
+        axs[d, ii].scatter(plot_t, scaled_eval_data[ii, d, 
+                                                 :][plot_inds_T], color='k', label='true')
+        axs[d, ii].plot(t, scaled_eval_data[ii, d, :], 'k--')
+        axs[d, ii].scatter(plot_t, gen_data[ii, d, 
+                                                :][plot_inds_T], color='r', label='predicted')
+        axs[d, ii].plot(t, gen_data[ii, d, :], 'r--')
+        axs[d, ii].set_xticks(np.arange(0, 2, .25))
+        axs[d, ii].set_xlim([0, 2])
+        
+        if d==0:
+            axs[d, ii].set_yticks(np.arange(-1, 1.2, 0.2))
+            axs[d, ii].set_ylim([-0.05, 1.05])
+        
+        axs[d, ii].legend()        
+
+    f.savefig('results/true_vs_predicted_pvae_single_seq.png')
+    plt.show()    
+    '''
+    
 if __name__ == '__main__':
     main()
