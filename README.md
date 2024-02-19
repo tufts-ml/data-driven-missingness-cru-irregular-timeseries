@@ -41,4 +41,4 @@ Run the following lines of code for reproducing the toy experiments
 
 > Note : To run the pVAE experiment, please create a separate enviroment using this [requirements.txt](https://github.com/steveli/partial-encoder-decoder/blob/master/requirements.txt) file.
 
-![toy_experiments](https://github.com/tufts-ml/mnar-cru-irregular-timeseries/blob/main/toydata_extrapolation.png)
+![toy_experiments](toydata_extrapolation.png)

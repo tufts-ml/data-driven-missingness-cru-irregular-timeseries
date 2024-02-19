@@ -1,5 +1,3 @@
-
-
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torch.nn.utils.rnn import pad_sequence
@@ -54,7 +52,7 @@ def load_data(args):
     
     # Physionet
     elif args.dataset == 'physionet':
-        file_path = '/cluster/tufts/hugheslab/prath01/projects/time_series_prediction/datasets/physionet/'
+        file_path = ''# path to saved file of normalization estimates, like min and max
         if not os.path.exists(os.path.join(file_path, 'norm_train_valid.pt')):
             print(f'Downloading Physionet data and saving to {file_path} ...')
             download_and_process_physionet(file_path)
