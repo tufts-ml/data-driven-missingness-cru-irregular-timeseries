@@ -41,8 +41,6 @@ Run the following lines of code for reproducing the toy experiments
 
 > Note : To run the pVAE experiment, please create a separate enviroment using this [requirements.txt](https://github.com/steveli/partial-encoder-decoder/blob/master/requirements.txt) file.
 
-![toy_experiments](toydata_extrapolation.png)
-
 ## Run MIMIC-IV experiments
 -Follow the instructions to pre-process the data in [data_preprocessing/MIMIC-IV](data_preprocessing/MIMIC-IV)
 
@@ -54,3 +52,5 @@ Then run the script to train MNAR-CRU and CRU
 
 Then run the script to train MNAR-CRU and CRU
 `bash CRU/launch_cru_extrapolation_eicu.sh run_here`
+
+![toy_experiments](toydata_extrapolation.png)
