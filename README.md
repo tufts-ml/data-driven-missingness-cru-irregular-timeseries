@@ -1,5 +1,5 @@
-# mnar-cru-irregular-timeseries
-Code for irregular time-series models with missing-not-at-random assumption
+# data-driven-cru-irregular-timeseries
+Code for irregular time-series models with data-driven missingness assumption
 
 ## Cloning the anonymous repo 
 Please follow the instructions [here](https://github.com/fedebotu/clone-anonymous-github) to clone an anonymous repo. (Credit : Clone Anonymous Github created by fedebotu)
@@ -8,13 +8,13 @@ Please follow the instructions [here](https://github.com/fedebotu/clone-anonymou
 Run the following lines of code for reproducing the toy experiments
 
 ### Create the environment
-`conda create -n mnar-cru python=3.9.7`
+`conda create -n data-driven-cru python=3.9.7`
 
-`conda activate mnar-cru`
+`conda activate data-driven-cru`
 
 `pip install -r requirements.txt`
 
-### MNAR-CRU
+### CRU-FM
 `python CRU/run_toy_experiment_cru.py --random_seed 68 --mnar True`
 
 ### CRU 
@@ -44,13 +44,13 @@ Run the following lines of code for reproducing the toy experiments
 ## Run MIMIC-IV experiments
 -Follow the instructions to pre-process the data in [data_preprocessing/MIMIC-IV](data_preprocessing/MIMIC-IV)
 
-Then run the script to train MNAR-CRU and CRU
+Then run the script to train CRU-FM and CRU
 `bash CRU/launch_cru_extrapolation_mimic.sh run_here`
 
 ## Run eICU experiments
 -Follow the instructions to pre-process the data in [data_preprocessing/eICU](data_preprocessing/eICU)
 
-Then run the script to train MNAR-CRU and CRU
+Then run the script to train CRU-FM and CRU
 `bash CRU/launch_cru_extrapolation_eicu.sh run_here`
 
 ![toy_experiments](toydata_extrapolation.png)
