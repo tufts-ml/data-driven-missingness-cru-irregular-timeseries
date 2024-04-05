@@ -1,4 +1,4 @@
-# data-driven-cru-irregular-timeseries
+# data-driven-missingness-cru-irregular-timeseries
 Code for irregular time-series models with data-driven missingness assumption
 
 ## Cloning the anonymous repo 
@@ -8,9 +8,9 @@ Please follow the instructions [here](https://github.com/fedebotu/clone-anonymou
 Run the following lines of code for reproducing the toy experiments
 
 ### Create the environment
-`conda create -n data-driven-cru python=3.9.7`
+`conda create -n data-driven-miss-cru python=3.9.7`
 
-`conda activate data-driven-cru`
+`conda activate data-driven-miss-cru`
 
 `pip install -r requirements.txt`
 
